@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
 const assetSchema = new mongoose.Schema({
-  assetType: {
-    type: mongoose.Schema.Types.Mixed,
+  assetTypeId: {
+    type: mongoose.Schema.ObjectId,
+    ref:"AssetCategory",
     required: [true, "give assest type or create one"],
   },
   make: {

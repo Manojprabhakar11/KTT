@@ -3,11 +3,9 @@ const AssetCategory = require("../../models/AssestTypeModel");
 
 exports.createAsset = async (req, res) => {
   try {
-    const { assetType, make, model, serialNumber } = req?.body;
-    const assetCategory = await AssetCategory.findById(assetType);
-    if (!assetCategory) throw new Error("invalid assest type id");
+    const { assetTypeId, make, model, serialNumber } = req?.body;
     const newAsset = await Asset.create({
-      assetType: assetCategory,
+      assetTypeId: assetTypeId,
       make,
       model,
       serialNumber,
@@ -36,7 +34,16 @@ exports.getAssets = async (req, res) => {
         ],
       };
     }
-    const assets = await Asset.find(searchQuery);
+    
+    const assets = await Asset.aggregate([{ $match: searchQuery },
+    {
+      $lookup: {
+        from: "assetcategories", 
+        localField: 'assetTypeId',
+        foreignField: '_id',
+        as: 'assetType',
+      },
+    },]);
     res.status(200).json({
       status: "success",
       data: {
